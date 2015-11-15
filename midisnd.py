@@ -179,6 +179,10 @@ OUTPUT = {
 }
 
 def encode_sound(instrument, samples):
+	# Empty sound? Generate a null lump that does not stop other
+	# sounds from playing.
+	if len(samples) == 0:
+		return struct.pack("B", 4)
 	# Always turn the sound off at the end.
 	samples += [0]
 	result = struct.pack("<HHHH", 1, len(samples), 0, instrument)
