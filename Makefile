@@ -1,10 +1,4 @@
 
-DEUTEX=deutex
-
-midisnd.wad : wadinfo.txt
-	rm -f $@
-	$(DEUTEX) -build wadinfo.txt $@
-
-wadinfo.txt: midisnd.py
+midisnd.wad: midisnd.py wadgen.py midi.py
 	python midisnd.py
 

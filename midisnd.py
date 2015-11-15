@@ -17,6 +17,7 @@
 
 from midi import *
 import struct
+import wadgen
 
 BLANK = ("Acoustic Grand Piano", [])
 
@@ -190,22 +191,15 @@ def encode_sound(instrument, samples):
 		result += struct.pack("B", s)
 	return result
 
-def write_samples(data):
-	for name, (instr_name, samples) in data.items():
-		instr_index = INSTRUMENTS.index(instr_name)
-		assert instr_index >= 0, "unknown instrument '%s'" % instr_name
-		encoded = encode_sound(instr_index, samples)
-		with open("lumps/%s.lmp" % name, "w") as f:
-			f.write(encoded)
+def write_wad_file(filename, data):
+	with wadgen.WadGenerator(filename) as wad:
+		for name, (instr_name, samples) in data.items():
+			instr_index = INSTRUMENTS.index(instr_name)
+			assert instr_index >= 0, (
+				"unknown instrument '%s'" % instr_name)
+			encoded = encode_sound(instr_index, samples)
+			wad.add("da%s" % name, encoded)
+			wad.add("dm%s" % name, encoded)
 
-def write_config(filename, data):
-	with open(filename, "w") as f:
-		f.write("[lumps]\n")
-		for name in data.keys():
-			f.write("da%s = %s\n" % (name, name))
-			f.write("dm%s = %s\n" % (name, name))
-
-
-write_samples(OUTPUT)
-write_config("wadinfo.txt", OUTPUT)
+write_wad_file("midisnd.wad", OUTPUT)
 
